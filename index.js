@@ -45,15 +45,44 @@ app.get("/static/favicon-32x32.png", (req, res) => {
 app.get("/static/favicon-16x16.png", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/favicon-16x16.png")) // getting favicon
 })
+
+app.get("/static/assets/css/main.css", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/css/main.css"))
+})
+
+app.get("/static/assets/img/sun.svg", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/img/sun.svg"))
+})
+
+app.get("/static/assets/js/client.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/js/client.js"))
+})
 //#endregion
 
 //#region handling client requests
 app.get("/", (req, res) => {
-    res.render('index')
+    res.render('index') 
+})
+
+app.get("/registration", (req, res) => {
+    const template = [
+        {name: "Даниил", login: "PIPING_GAY"},
+        {name: "Артём", login: "electrify_me"},
+        {name: "Аделина", login: "_ADELBLEN_"},
+        {name: "Андрей", login: "Yazeus"},
+        {name: "Миша", login: "stonks"},
+        {name: "Эвелина", login: "blackstalker228"},
+        {name: "Василиса", login: "fony666"}
+    ]
+
+    const randomRegData = Math.ceil((Math.random() * template.length) - 1)
+    console.log(randomRegData)
+
+    res.render('registration', {
+        randomRegDataTemplate: template[randomRegData]
+    }) 
 })
 //#endregion 
 
 // starting server
-HTTPServer.listen(PORT, () => {
-
-})
+HTTPServer.listen(PORT, () => {})
