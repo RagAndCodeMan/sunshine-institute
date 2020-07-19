@@ -112,7 +112,7 @@ app.post("/register_me", (req, res) => {
     const data = [req.body.name, req.body.login, req.body.password]
 
     MongoDB.connect((err) => {
-        const collection = MongoDB.db("sunshine-database").collection("users")
+        const collection = MongoDB.db("heroku_0jtjpd1r").collection("users")
 
         collection.insertOne({name: data[0], login: data[1], password: data[2]})
         .then(() => {
