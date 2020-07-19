@@ -7,10 +7,11 @@ const path              = require("path")
 const ejs               = require("ejs")
 const MongoClient       = require("mongodb").MongoClient
 
+const uri           = "mongodb+srv://admin:kakashka@sunshine.k3eim.mongodb.net/sunshine-database?retryWrites=true&w=majority"
 const app           = express()                 // initialize express
 const HTTPServer    = HTTP.createServer(app)    
 const socket        = io(HTTPServer)            // initialize socket.io
-const MongoDB       = new MongoClient("mongodb+srv://admin:kakashka@sunshine.k3eim.mongodb.net/sunshine-database?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true})
+const MongoDB       = new MongoClient("mongodb://Admin:kakashka.com12345678@ds147520.mlab.com:47520/heroku_0jtjpd1r", {useNewUrlParser: true, useUnifiedTopology: true})
 
 const PORT = process.env.PORT || 3000 
 
