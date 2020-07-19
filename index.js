@@ -72,21 +72,17 @@ app.post("/register_me", (req, res) => {
     const password = req.body.password
     const login = req.body.login
 
-    if (name === "" || password === "" || login === "") {
-        res.render('error')
-    } else if (withoutCyrCheck(login)) {
-        res.render('error')
-    } else {
-        MongoDB.connect(err => {
-            const collection = MongoDB.db("sunshine-database").collection("users")
+    MongoDB.connect(err => {
+        const collection = MongoDB.db("sunshine-database").collection("users")
 
-            collection.insertOne({name, password, login}).then(() => {
-                MongoDB.close();
-            })
+        collection.insertOne({name, password, login}).then(() => {
+            res.render('success', {name})
+        }).catch(err => {
+            console.log(err)
         })
 
-        res.render('success', {name})
-    }
+        MongoDB.close();
+    })
 })
 
 app.get("/registration", (req, res) => {
