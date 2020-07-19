@@ -2,6 +2,9 @@
   "name": "sunshine-conference",
   "version": "1.0.0",
   "description": "Simple secret chat for \"solnishki\"",
+  "engines": {
+    "node": "14.x"
+  },
   "main": "index.js",
   "scripts": {
     "ip": "node ip.js",
