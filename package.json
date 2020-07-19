@@ -4,6 +4,7 @@
   "description": "Simple secret chat for \"solnishki\"",
   "main": "index.js",
   "scripts": {
+    "ip": "node ip.js",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -31,6 +32,7 @@
     "cookie-parser": "^1.4.5",
     "ejs": "^3.1.3",
     "express": "^4.17.1",
+    "ip": "^1.1.5",
     "mongodb": "^3.5.9",
     "socket.io": "^2.3.0"
   }
