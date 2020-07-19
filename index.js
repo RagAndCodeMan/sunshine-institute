@@ -29,6 +29,10 @@ app.get("/favicon.ico", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/favicon.ico")) // getting favicon
 })
 
+app.get("static/favicon.ico", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/favicon.ico")) // getting favicon
+})
+
 app.get("/static/apple-touch-icon.png", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/apple-touch-icon.png"))
 })
