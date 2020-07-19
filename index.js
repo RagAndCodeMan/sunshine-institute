@@ -4,10 +4,12 @@ const cookie            = require("cookie-parser")
 const HTTPRequestParser = require("body-parser")
 const HTTP              = require("http")
 const path              = require("path")
+const MongoClient       = require("mongodb").MongoClient
 
 const app           = express()                 // initialize express
 const HTTPServer    = HTTP.createServer(app)    
 const socket        = io(HTTPServer)            // initialize socket.io
+const MongoDB       = new MongoClient("mongodb+srv://admin:kakashka@sunshine.k3eim.mongodb.net/sunshine-database?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true})
 
 const PORT = process.env.PORT || 3000 
 
@@ -64,6 +66,30 @@ app.get("/", (req, res) => {
     res.render('index') 
 })
 
+app.post("/register_me", (req, res) => {
+    const name = req.body.name
+    const password = req.body.password
+    const login = req.body.login
+
+    if (name === "" || password === "" || login === "") {
+        res.render('error')
+    } else if (withoutCyrCheck(login)) {
+        res.render('error')
+    } else {
+        MongoDB.connect(err => {
+            const collection = MongoDB.db("sunshine-database").collection("users")
+
+            collection.insertOne({name, password, login}).then(() => {
+                MongoDB.close();
+            }).catch((err) => {
+                throw err
+            })
+        })
+
+        res.render('success', {name})
+    }
+})
+
 app.get("/registration", (req, res) => {
     const template = [
         {name: "Даниил", login: "PIPING_GAY"},
@@ -76,7 +102,6 @@ app.get("/registration", (req, res) => {
     ]
 
     const randomRegData = Math.ceil((Math.random() * template.length) - 1)
-    console.log(randomRegData)
 
     res.render('registration', {
         randomRegDataTemplate: template[randomRegData]
@@ -86,3 +111,10 @@ app.get("/registration", (req, res) => {
 
 // starting server
 HTTPServer.listen(PORT, () => {})
+
+function withoutCyrCheck(data) {
+    var value = data;
+    var re = /а|б|в|г|д|е|ё|ж|з|и|ё|к|л|м|н|о|п|р|с|т|у|ф|х|ц|ч|ш|щ|ъ|ы|ь|э|ю|я/gi;
+
+    return re.test(value)
+}
