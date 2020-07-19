@@ -76,8 +76,8 @@ app.post("/register_me", (req, res) => {
     const password = req.body.password
     const login = req.body.login
 
-    MongoDB.connect((err, client) => {
-        const collection = client.db("sunshine-database").collection("users")
+    MongoDB.connect((err) => {
+        const collection = MongoDB.db("sunshine-database").collection("users")
 
         collection.insertOne({name, password, login}).then(() => {
             res.render('success', {name})
@@ -85,7 +85,7 @@ app.post("/register_me", (req, res) => {
             console.log(err)
         })
 
-        client.close();
+        MongoDB.close();
     })
 })
 
