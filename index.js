@@ -29,8 +29,24 @@ app.get("/favicon.ico", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/favicon.ico")) // getting favicon
 })
 
-app.get("/static/favicon.ico", (req, res) => {
-    res.sendFile(path.join(__dirname, "/static/favicon.ico")) // getting favicon
+app.get("/static/apple-touch-icon.png", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/apple-touch-icon.png"))
+})
+
+app.get("/static/android-chrome-192x192.png", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/android-chrome-192x192.png"))
+})
+
+app.get("/static/android-chrome-512x512.png", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/android-chrome-512x512.png"))
+})
+
+app.get("/static/safari-pinned-tab.svg", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/safari-pinned-tab.svg"))
+})
+
+app.get("/static/browserconfig.xml", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/browserconfig.xml"))
 })
 
 app.get("/static/lib/bootstrap/bootstrap.min.css", (req, res) => {
