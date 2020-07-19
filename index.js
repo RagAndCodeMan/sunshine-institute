@@ -25,7 +25,7 @@ app.use(HTTPRequestParser.urlencoded({
 //#endregion
 
 //#region include static files
-app.get("favicon.ico", (req, res) => {
+app.get("/favicon.ico", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/favicon.ico")) // getting favicon
 })
 
