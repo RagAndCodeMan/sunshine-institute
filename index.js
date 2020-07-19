@@ -72,20 +72,22 @@ app.get("/", (req, res) => {
 })
 
 app.post("/register_me", (req, res) => {
-    const name = req.body.name
-    const password = req.body.password
-    const login = req.body.login
+    const data = [req.body.name, req.body.login, req.body.password]
 
     MongoDB.connect((err) => {
         const collection = MongoDB.db("sunshine-database").collection("users")
 
-        collection.insertOne({name, password, login}).then(() => {
-            res.render('success', {name})
-        }).catch(err => {
-            console.log(err)
-        })
+        collection.insertOne({name: data[0], login: data[1], password: data[2]})
+        .then(() => {
+            res.render('success', {
+                name: data[0]
+            })
 
-        MongoDB.close();
+            MongoDB.close()
+        })
+        .catch((reason) => {
+            throw reason
+        })
     })
 })
 
