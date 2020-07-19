@@ -11,7 +11,7 @@ const uri           = "mongodb+srv://admin:kakashka@sunshine.k3eim.mongodb.net/s
 const app           = express()                 // initialize express
 const HTTPServer    = HTTP.createServer(app)    
 const socket        = io(HTTPServer)            // initialize socket.io
-const MongoDB       = new MongoClient("mongodb://Admin:kakashka.com12345678@ds147520.mlab.com:47520/heroku_0jtjpd1r", {useNewUrlParser: true, useUnifiedTopology: true})
+const MongoDB       = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true})
 
 const PORT = process.env.PORT || 3000 
 
@@ -108,24 +108,26 @@ app.get("/", (req, res) => {
     res.render('index') 
 })
 
+let succefull_connection = false
+
 app.post("/register_me", (req, res) => {
     const data = [req.body.name, req.body.login, req.body.password]
 
-    MongoDB.connect((err) => {
-        const collection = MongoDB.db("heroku_0jtjpd1r").collection("users")
+    if (succefull_connection) {
+        const collection = MongoDB.db("sunshine-database").collection("users")
 
         collection.insertOne({name: data[0], login: data[1], password: data[2]})
         .then(() => {
             res.render('success', {
                 name: data[0]
             })
-
-            MongoDB.close()
         })
         .catch((reason) => {
-            throw reason
+            res.write("Какая-то ошибка")
         })
-    })
+    } else {
+        res.write("Какая-то ошибка")
+    }
 })
 
 app.get("/registration", (req, res) => {
@@ -148,7 +150,17 @@ app.get("/registration", (req, res) => {
 //#endregion 
 
 // starting server
-HTTPServer.listen(PORT, () => {})
+HTTPServer.listen(PORT, () => {
+    MongoDB.connect()
+    .then(() => {
+        succefull_connection = true
+
+        console.log("Успешное подключение к базе данных")
+    })
+    .catch((err) => {
+        throw err
+    })
+})
 
 function withoutCyrCheck(data) {
     var value = data;
