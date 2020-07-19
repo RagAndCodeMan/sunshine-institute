@@ -4,6 +4,7 @@ const cookie            = require("cookie-parser")
 const HTTPRequestParser = require("body-parser")
 const HTTP              = require("http")
 const path              = require("path")
+const ejs               = require("ejs")
 const MongoClient       = require("mongodb").MongoClient
 
 const app           = express()                 // initialize express
@@ -81,8 +82,6 @@ app.post("/register_me", (req, res) => {
 
             collection.insertOne({name, password, login}).then(() => {
                 MongoDB.close();
-            }).catch((err) => {
-                throw err
             })
         })
 
