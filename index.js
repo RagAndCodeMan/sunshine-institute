@@ -111,22 +111,42 @@ app.get("/", (req, res) => {
 let succefull_connection = false
 
 app.post("/register_me", (req, res) => {
-    const data = [req.body.name, req.body.login, req.body.password]
+    const data = [req.body.name.trim(), req.body.login.trim(), req.body.password.trim(), req.body.re_password.trim()]
 
-    if (succefull_connection) {
+    if (succefull_connection && validate(data[0], data[1], data[2], data[3])) {
         const collection = MongoDB.db("sunshine-database").collection("users")
 
         collection.insertOne({name: data[0], login: data[1], password: data[2]})
         .then(() => {
-            res.render('success', {
-                name: data[0]
+            res.render('reg_result', {
+                isPositive: true,
+                name: data[0],
+                heading: "Отлично!",
+                title: "Отлично! Вы зарегистрированы!", 
+                text: ", вы успешно зарегистрированы в системе! Остался последний шаг: вам нужно авторизоваться!",
+                continue_btn_text: "Перейти к авторизации",
+                continue_btn_url: "/"
             })
         })
         .catch((reason) => {
-            res.write("Какая-то ошибка")
+            res.render('reg_result', {
+                isPositive: false,
+                heading: "Что-то пошло не так...",
+                title: "Произошла ошибка", 
+                text: "К сожалению, на этапе обработки вашего запроса что-то пошло не так, и мы не знаем, что именно.",
+                continue_btn_text: "Попробовать ещё раз",
+                continue_btn_url: "/registration"
+            })
         })
     } else {
-        res.write("Какая-то ошибка")
+        res.render('reg_result', {
+            isPositive: false,
+            heading: "Что-то пошло не так...",
+            title: "Произошла ошибка", 
+            text: "К сожалению, на этапе обработки вашего запроса что-то пошло не так, и мы не знаем, что именно.",
+            continue_btn_text: "Попробовать ещё раз",
+            continue_btn_url: "/registration"
+        })
     }
 })
 
@@ -167,4 +187,20 @@ function withoutCyrCheck(data) {
     var re = /а|б|в|г|д|е|ё|ж|з|и|ё|к|л|м|н|о|п|р|с|т|у|ф|х|ц|ч|ш|щ|ъ|ы|ь|э|ю|я/gi;
 
     return re.test(value)
+}
+
+function validate(name, login, password, re_password) {
+    if (name.trim() === "" || login.trim() === "" || password.trim() === "" || re_password.trim() === "") 
+        return false
+    
+    else if (login.trim().length <= 3)
+        return false
+
+    else if (withoutCyrCheck(login)) 
+        return false
+    
+    else if (password.trim() !== re_password.trim())
+        return false
+
+    else return true
 }
