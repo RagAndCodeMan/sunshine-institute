@@ -116,26 +116,31 @@ app.post("/register_me", (req, res) => {
     if (succefull_connection && validate(data[0], data[1], data[2], data[3])) {
         const collection = MongoDB.db("sunshine-database").collection("users")
 
-        collection.insertOne({name: data[0], login: data[1], password: data[2]})
+        collection.createIndex({login: 1}, {unique: true})
         .then(() => {
-            res.render('reg_result', {
-                isPositive: true,
-                name: data[0],
-                heading: "Отлично!",
-                title: "Отлично! Вы зарегистрированы!", 
-                text: ", вы успешно зарегистрированы в системе! Остался последний шаг: вам нужно авторизоваться!",
-                continue_btn_text: "Перейти к авторизации",
-                continue_btn_url: "/"
+            collection.insertOne({name: data[0], login: data[1], password: data[2]})
+            .then(() => {
+                res.render('reg_result', {
+                    isPositive: true,
+                    name: data[0],
+                    heading: "Отлично!",
+                    title: "Отлично! Вы зарегистрированы!", 
+                    text: ", вы успешно зарегистрированы в системе! Остался последний шаг: вам нужно авторизоваться!",
+                    hasReasons: false,
+                    continue_btn_text: "Перейти к авторизации",
+                    continue_btn_url: "/"
+                })
             })
-        })
-        .catch((reason) => {
-            res.render('reg_result', {
-                isPositive: false,
-                heading: "Что-то пошло не так...",
-                title: "Произошла ошибка", 
-                text: "К сожалению, на этапе обработки вашего запроса что-то пошло не так, и мы не знаем, что именно.",
-                continue_btn_text: "Попробовать ещё раз",
-                continue_btn_url: "/registration"
+            .catch(() => {
+                res.render('reg_result', {
+                    isPositive: false,
+                    heading: "Ошибка: такой пользователь уже существует",
+                    title: "Произошла ошибка", 
+                    text: "Пользователь с таким логином уже существует, попробуйте ещё раз с другими данными.",
+                    hasReasons: false,
+                    continue_btn_text: "Попробовать ещё раз",
+                    continue_btn_url: "/registration"
+                })
             })
         })
     } else {
@@ -143,7 +148,7 @@ app.post("/register_me", (req, res) => {
             isPositive: false,
             heading: "Что-то пошло не так...",
             title: "Произошла ошибка", 
-            text: "К сожалению, на этапе обработки вашего запроса что-то пошло не так, и мы не знаем, что именно.",
+            text: "К сожалению, на этапе обработки вашего запроса что-то пошло не так: 1) Мы не смогли подключиться к базе данных 2) Вы ввели некорректные данные (пароли не совпадают, логин введён русскими символами, и т.д.)",
             continue_btn_text: "Попробовать ещё раз",
             continue_btn_url: "/registration"
         })
