@@ -98,18 +98,24 @@ app.get("/static/assets/img/sun.svg", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/assets/img/sun.svg"))
 })
 
-app.get("/static/assets/js/client.js", (req, res) => {
-    res.sendFile(path.join(__dirname, "/static/assets/js/client.js"))
+app.get("/static/assets/js/registration.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/js/registration.js"))
+})
+
+app.get("/static/assets/js/auth.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/js/auth.js"))
 })
 //#endregion
 
 //#region handling client requests
 app.get("/", (req, res) => {
-    res.render('index') 
+    if (req.cookies.name === undefined) res.render('index') 
+    else res.redirect("/chat")
 })
 
 let succefull_connection = false
 
+//#region registration
 app.post("/register_me", (req, res) => {
     const data = [req.body.name.trim(), req.body.login.trim(), req.body.password.trim(), req.body.re_password.trim()]
 
@@ -120,31 +126,29 @@ app.post("/register_me", (req, res) => {
         .then(() => {
             collection.insertOne({name: data[0], login: data[1], password: data[2]})
             .then(() => {
-                res.render('reg_result', {
+                res.render('reg_auth_result', {
                     isPositive: true,
                     name: data[0],
                     heading: "Отлично!",
                     title: "Отлично! Вы зарегистрированы!", 
                     text: ", вы успешно зарегистрированы в системе! Остался последний шаг: вам нужно авторизоваться!",
-                    hasReasons: false,
                     continue_btn_text: "Перейти к авторизации",
                     continue_btn_url: "/"
                 })
             })
             .catch(() => {
-                res.render('reg_result', {
+                res.render('reg_auth_result', {
                     isPositive: false,
                     heading: "Ошибка: такой пользователь уже существует",
                     title: "Произошла ошибка", 
                     text: "Пользователь с таким логином уже существует, попробуйте ещё раз с другими данными.",
-                    hasReasons: false,
                     continue_btn_text: "Попробовать ещё раз",
                     continue_btn_url: "/registration"
                 })
             })
         })
     } else {
-        res.render('reg_result', {
+        res.render('reg_auth_result', {
             isPositive: false,
             heading: "Что-то пошло не так...",
             title: "Произошла ошибка", 
@@ -153,6 +157,44 @@ app.post("/register_me", (req, res) => {
             continue_btn_url: "/registration"
         })
     }
+})
+//#endregion
+
+//#region 
+app.post("/authenticate_me", (req, res) => {
+    const data = [req.body.login, req.body.password]
+
+    if (succefull_connection) {
+        const collection = MongoDB.db("sunshine-database").collection("users")
+
+        collection.findOne({login: data[0], password: data[1]})
+        .then((data) => {
+            const findedObject = data
+            const name = findedObject.name
+
+            res.cookie("name", name)
+
+            res.redirect("/chat") // TODO: сделать страницу чата
+        })
+        .catch(() => {
+            res.render("reg_auth_result", {
+                isPositive: false,
+                heading: "Ошибка",
+                title: "Ошибка", 
+                text: "Такого пользователя не существует",
+                continue_btn_text: "Попробовать ещё раз",
+                continue_btn_url: "/"
+            })
+        })
+    }
+})
+//#endregion
+
+app.get("/chat", (req, res) => {
+    if (req.cookies.name !== undefined)
+        res.render("chat", {name: req.cookies.name})
+
+    else res.redirect("/")
 })
 
 app.get("/registration", (req, res) => {
@@ -168,9 +210,13 @@ app.get("/registration", (req, res) => {
 
     const randomRegData = Math.ceil((Math.random() * template.length) - 1)
 
-    res.render('registration', {
-        randomRegDataTemplate: template[randomRegData]
-    }) 
+    if (req.cookies.name === undefined) {
+        res.render('registration', {
+            randomRegDataTemplate: template[randomRegData]
+        }) 
+    }
+    else res.redirect("/chat")
+    
 })
 //#endregion 
 
@@ -187,6 +233,7 @@ HTTPServer.listen(PORT, () => {
     })
 })
 
+//#region other
 function withoutCyrCheck(data) {
     var value = data;
     var re = /а|б|в|г|д|е|ё|ж|з|и|ё|к|л|м|н|о|п|р|с|т|у|ф|х|ц|ч|ш|щ|ъ|ы|ь|э|ю|я/gi;
@@ -209,3 +256,4 @@ function validate(name, login, password, re_password) {
 
     else return true
 }
+//#endregion
