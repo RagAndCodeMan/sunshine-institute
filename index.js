@@ -94,6 +94,10 @@ app.get("/static/assets/css/main.css", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/assets/css/main.css"))
 })
 
+app.get("/static/assets/css/chat.css", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/css/chat.css"))
+})
+
 app.get("/static/assets/img/sun.svg", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/assets/img/sun.svg"))
 })
@@ -105,6 +109,10 @@ app.get("/static/assets/js/registration.js", (req, res) => {
 app.get("/static/assets/js/auth.js", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/assets/js/auth.js"))
 })
+
+app.get("/static/assets/js/chat.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/assets/js/chat.js"))
+})
 //#endregion
 
 //#region handling client requests
@@ -112,6 +120,7 @@ app.get("/", (req, res) => {
     if (req.cookies.name === undefined) res.render('index') 
     else res.redirect("/chat")
 })
+
 
 let succefull_connection = false
 
@@ -160,7 +169,7 @@ app.post("/register_me", (req, res) => {
 })
 //#endregion
 
-//#region 
+//#region authorisation
 app.post("/authenticate_me", (req, res) => {
     const data = [req.body.login, req.body.password]
 
@@ -232,6 +241,22 @@ HTTPServer.listen(PORT, () => {
         throw err
     })
 })
+
+//#region SOCKET CHAT
+socket.on("connection", (socket_data) => {
+    socket_data.on("user_connected", (name) => {
+        socket.emit("display_connection", name)
+    })
+
+    socket_data.on("disconnect", () => {
+        socket.emit("display_disconnection")
+    });
+
+    socket_data.on("message_send", (data) => {
+        socket.emit("display_message", data)
+    })
+})
+//#endregion
 
 //#region other
 function withoutCyrCheck(data) {
